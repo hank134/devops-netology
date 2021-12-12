@@ -1,87 +1,90 @@
-1.	Какой системный вызов делает команда cd? В прошлом ДЗ мы выяснили, что cd не является самостоятельной программой, это shell builtin, поэтому запустить strace непосредственно на cd не получится. Тем не менее, вы можете запустить strace на /bin/bash -c 'cd /tmp'. В этом случае вы увидите полный список системных вызовов, которые делает сам bash при старте. Вам нужно найти тот единственный, который относится именно к cd. Обратите внимание, что strace выдаёт результат своей работы в поток stderr, а не в stdout.
-chdir("/tmp")
+1.	На лекции мы познакомились с node_exporter. В демонстрации его исполняемый файл запускался в background. Этого достаточно для демо, но не для настоящей production-системы, где процессы должны находиться под внешним управлением. Используя знания из лекции по systemd, создайте самостоятельно простой unit-файл для node_exporter:
+o	поместите его в автозагрузку,
+o	предусмотрите возможность добавления опций к запускаемому процессу через внешний файл (посмотрите, например, на systemctl cat cron),
+o	удостоверьтесь, что с помощью systemctl процесс корректно стартует, завершается, а после перезагрузки автоматически поднимается.
+Готово
+2.	Ознакомьтесь с опциями node_exporter и выводом /metrics по-умолчанию. Приведите несколько опций, которые вы бы выбрали для базового мониторинга хоста по CPU, памяти, диску и сети.
 
-2.	Попробуйте использовать команду file на объекты разных типов на файловой системе. Например:
-vagrant@netology1:~$ file /dev/tty
-/dev/tty: character special (5/0)
-vagrant@netology1:~$ file /dev/sda
-/dev/sda: block special (8/0)
-vagrant@netology1:~$ file /bin/bash
-/bin/bash: ELF 64-bit LSB shared object, x86-64
-Используя strace выясните, где находится база данных file на основании которой она делает свои догадки.
-openat(AT_FDCWD, "/usr/share/misc/magic.mgc", O_RDONLY) = 3
-3.	Предположим, приложение пишет лог в текстовый файл. Этот файл оказался удален (deleted в lsof), однако возможности сигналом сказать приложению переоткрыть файлы или просто перезапустить приложение – нет. Так как приложение продолжает писать в удаленный файл, место на диске постепенно заканчивается. Основываясь на знаниях о перенаправлении потоков предложите способ обнуления открытого удаленного файла (чтобы освободить место на файловой системе).
-После удаления файла в который пишется программа, через Lsof находим в какой дескриптор пишется результат, отчищаем и перенаправляем его в новый файл
-vagrant@vagrant:~$ ping 8.8.8.8 > /tmp/pingya &
-[3] 2175
-vagrant@vagrant:~$ rm /tmp/pingya
-vagrant@vagrant:~$ sudo lsof -p 2175 | grep pingya
-ping    2175 vagrant    1w   REG  253,0     5537 3670028 /tmp/pingya (deleted)
-vagrant@vagrant:~$ echo “” > /proc/2175/fd/1
-vagrant@vagrant:~$ sudo cat /proc/2175/fd/1 > /tmp/ping2
+node_cpu_seconds_total
+node_pressure_cpu_waiting_seconds_total
+process_cpu_seconds_total
 
-4.	Занимают ли зомби-процессы какие-то ресурсы в ОС (CPU, RAM, IO)?
-Процесс после завершения освобождает свои ресурсы о ним в таблице процессов храниться информация о статусе завершения до тех пор пока родительский процесс не прочитает его, после этого запись о зомби процессе удалятся из таблицы 
+node_disk_io_now
+node_disk_io_time_seconds_total
+node_filesystem_avail_bytes
+node_filesystem_free_bytes
+node_disk_read_bytes_total
+node_disk_writes_merged_total
 
-5.	В iovisor BCC есть утилита opensnoop:
-root@vagrant:~# dpkg -L bpfcc-tools | grep sbin/opensnoop
-/usr/sbin/opensnoop-bpfcc
-На какие файлы вы увидели вызовы группы open за первую секунду работы утилиты? Воспользуйтесь пакетом bpfcc-tools для Ubuntu 20.04. Дополнительные сведения по установке.
-vagrant@vagrant:~$ sudo opensnoop-bpfcc -d 1
-PID    COMM               FD ERR PATH
-810    vminfo              4   0 /var/run/utmp
-594    dbus-daemon        -1   2 /usr/local/share/dbus-1/system-services
-594    dbus-daemon        18   0 /usr/share/dbus-1/system-services
-594    dbus-daemon        -1   2 /lib/dbus-1/system-services
-594    dbus-daemon        18   0 /var/lib/snapd/dbus-1/system-services/
-614    irqbalance          6   0 /proc/interrupts
-614    irqbalance          6   0 /proc/stat
-614    irqbalance          6   0 /proc/irq/20/smp_affinity
-614    irqbalance          6   0 /proc/irq/0/smp_affinity
-614    irqbalance          6   0 /proc/irq/1/smp_affinity
-614    irqbalance          6   0 /proc/irq/8/smp_affinity
-614    irqbalance          6   0 /proc/irq/12/smp_affinity
-614    irqbalance          6   0 /proc/irq/14/smp_affinity
-614    irqbalance          6   0 /proc/irq/15/smp_affinity /
+node_memory_MemAvailable_bytes
+node_memory_MemFree_bytes
+node_pressure_memory_waiting_seconds_total
 
 
 
-6.	Какой системный вызов использует uname -a? Приведите цитату из man по этому системному вызову, где описывается альтернативное местоположение в /proc, где можно узнать версию ядра и релиз ОС.
-uname({sysname="Linux", nodename="vagrant", ...}) = 0
-системный вызов uname
-Part of the utsname information is also accessible via /proc/sys/kernel/{ostype, hostname, osrelease, version, domainname}.
-7.	Чем отличается последовательность команд через ; и через && в bash? Например:
-root@netology1:~# test -d /tmp/some_dir; echo Hi
-Hi
-root@netology1:~# test -d /tmp/some_dir && echo Hi
-root@netology1:~#
-Есть ли смысл использовать в bash &&, если применить set -e?
-Оператор ; выполнить команды последовательно и выведет результат каждой комнды на экран
-&& опертаор выполнить вторую конадй только с лучае успеха первой 
- Set –e завершит скрипт если любая из команд выйдет с ошибкой,  если в нашем скрипт както обрабатывает ошибку то set –e не подойдет
+node_network_receive_bytes_total
+node_network_receive_drop_total
+node_network_receive_errs_total
+node_network_transmit_bytes_total
+node_network_transmit_drop_total
+node_network_transmit_errs_total
+node_network_up
 
-8.	Из каких опций состоит режим bash set -euxo pipefail и почему его хорошо было бы использовать в сценариях?
--e завершит скрипт если любая из комнад будет с ошибкой,
--u проверяет переменные, если переменнйо не будет то выдась ошибку
--x будет помимо резултатов выводить на экран все команды из скрипта
--o pipefail выведет ошибку если хоть одна команда в конвейере будет с ошибкой
 
-Такие парамеры запуска помогают получит больше информации при отладке скрипта.  
 
-9.	Используя -o stat для ps, определите, какой наиболее часто встречающийся статус у процессов в системе. В man ps ознакомьтесь (/PROCESS STATE CODES) что значат дополнительные к основной заглавной буквы статуса процессов. Его можно не учитывать при расчете (считать S, Ss или Ssl равнозначными).
-vagrant@vagrant:~$ ps ax -o stat | grep R |wc -l
-1
-vagrant@vagrant:~$ ps ax -o stat | grep S |wc -l
-55
-vagrant@vagrant:~$ ps ax -o stat | grep I |wc -l
-48
-vagrant@vagrant:~$ ps ax -o stat | grep D |wc -l
-0
-vagrant@vagrant:~$ ps ax -o stat | grep Z |wc -l
-0
-vagrant@vagrant:~$ ps ax -o stat | grep T |wc -l
-1
-vagrant@vagrant:~$ ps ax -o stat | grep W |wc -l
-0
-Наиболее частый статус у процесса S - процесс ожидает спит 20 секунд
-Доп символы означают приоритет процесса и опции процесса 
+
+
+3.	Установите в свою виртуальную машину Netdata. Воспользуйтесь готовыми пакетами для установки (sudo apt install -y netdata). После успешной установки:
+o	в конфигурационном файле /etc/netdata/netdata.conf в секции [web] замените значение с localhost на bind to = 0.0.0.0,
+o	добавьте в Vagrantfile проброс порта Netdata на свой локальный компьютер и сделайте vagrant reload:
+config.vm.network "forwarded_port", guest: 19999, host: 19999
+После успешной перезагрузки в браузере на своем ПК (не в виртуальной машине) вы должны суметь зайти на localhost:19999. Ознакомьтесь с метриками, которые по умолчанию собираются Netdata и с комментариями, которые даны к этим метрикам.
+
+Ознакомился
+
+4.	Можно ли по выводу dmesg понять, осознает ли ОС, что загружена не на настоящем оборудовании, а на системе виртуализации?
+
+vagrant@vagrant:~$ dmesg |grep virtual
+[    0.006049] CPU MTRRs all blank - virtualized system.
+[    0.180774] Booting paravirtualized kernel on KVM
+[    3.105476] systemd[1]: Detected virtualization oracle.
+Да система это понимает.
+
+5.	Как настроен sysctl fs.nr_open на системе по-умолчанию? Узнайте, что означает этот параметр. Какой другой существующий лимит не позволит достичь такого числа (ulimit --help)?
+vagrant@vagrant:~$ sysctl fs.nr_open
+fs.nr_open = 1048576
+Это максимальное кол-во дескрипторов файлов в системе
+
+Ulimit –n задает максимальное кол-во открытых файлов дискрипторов
+
+
+6.	Запустите любой долгоживущий процесс (не ls, который отработает мгновенно, а, например, sleep 1h) в отдельном неймспейсе процессов; покажите, что ваш процесс работает под PID 1 через nsenter. Для простоты работайте в данном задании под root (sudo -i). Под обычным пользователем требуются дополнительные опции (--map-root-user) и т.д.
+root@vagrant:~# sudo nsenter --target 1888 --pid --mount
+root@vagrant:/# ps
+    PID TTY          TIME CMD
+      1 pts/0    00:00:00 sleep
+      2 pts/0    00:00:00 bash
+     11 pts/0    00:00:00 ps
+
+7.	Найдите информацию о том, что такое :(){ :|:& };:. Запустите эту команду в своей виртуальной машине Vagrant с Ubuntu 20.04 (это важно, поведение в других ОС не проверялось). Некоторое время все будет "плохо", после чего (минуты) – ОС должна стабилизироваться. Вызов dmesg расскажет, какой механизм помог автоматической стабилизации. Как настроен этот механизм по-умолчанию, и как изменить число процессов, которое можно создать в сессии?
+
+vagrant@vagrant:/$ ulimit -a
+core file size          (blocks, -c) 0
+data seg size           (kbytes, -d) unlimited
+scheduling priority             (-e) 0
+file size               (blocks, -f) unlimited
+pending signals                 (-i) 7501
+max locked memory       (kbytes, -l) 65536
+max memory size         (kbytes, -m) unlimited
+open files                      (-n) 1024
+pipe size            (512 bytes, -p) 8
+POSIX message queues     (bytes, -q) 819200
+real-time priority              (-r) 0
+stack size              (kbytes, -s) 8192
+cpu time               (seconds, -t) unlimited
+max user processes              (-u) 7501
+virtual memory          (kbytes, -v) unlimited
+file locks                      (-x) unlimited
+
+ulimit –u можно задать огарничения по кол-ву процессов у пользователя
+
