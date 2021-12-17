@@ -2,7 +2,25 @@
 o	поместите его в автозагрузку,
 o	предусмотрите возможность добавления опций к запускаемому процессу через внешний файл (посмотрите, например, на systemctl cat cron),
 o	удостоверьтесь, что с помощью systemctl процесс корректно стартует, завершается, а после перезагрузки автоматически поднимается.
-Готово
+
+
+
+vagrant@vagrant:/$ systemctl cat node_exporter.service
+# /lib/systemd/system/node_exporter.service
+[Unit]
+Description=node_exporter
+
+
+[Service]
+EnvironmentFile=-/home/vagrant/nodeparam
+ExecStart=/home/vagrant/node_exporter-1.3.1.linux-amd64/node_exporter $EXTRA_OPTS
+
+
+[Install]
+WantedBy=multi-user.target
+
+
+
 2.	Ознакомьтесь с опциями node_exporter и выводом /metrics по-умолчанию. Приведите несколько опций, которые вы бы выбрали для базового мониторинга хоста по CPU, памяти, диску и сети.
 
 node_cpu_seconds_total
