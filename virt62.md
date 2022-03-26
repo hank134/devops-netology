@@ -12,8 +12,7 @@ tim@tim-VirtualBox:~$ docker volume create volDB
 volDB
 tim@tim-VirtualBox:~$ docker volume create volBackup
 volBackup
-tim@tim-VirtualBox:~$ docker run --rm -d --name pg-docker -e POSTGRES_PASSWORD=postgres -ti -p 5432:5432 -v volDB:/var/lib/postgresql/data -v volBackup:/var/lib/postgresql/backup pos
-tgres:12
+tim@tim-VirtualBox:~$ docker run --rm -d --name pg-docker -e POSTGRES_PASSWORD=postgres -ti -p 5432:5432 -v volDB:/var/lib/postgresql/data -v volBackup:/var/lib/postgresql/backup postgres:12
 ```
 
 ## Задача 2
@@ -207,25 +206,61 @@ test_db-# on clients.zakaz = orders.id;
          ->  Seq Scan on orders  (cost=0.00..22.00 rows=1200 width=4)
 (5 rows)
 ```
+отображает план запроса и предполагаемую стоимость запроса, но не выполняет сам запрос
+
 
 
 
 ## Задача 6
 
-Создайте бэкап БД test_db и поместите его в volume, предназначенный для бэкапов (см. Задачу 1).
+ 
+```
+tim@tim-VirtualBox:~$ docker exec -i -t pg-docker /bin/sh
+# pg_dumpall -h localhost -U postgres test_db > var/lib/postgresql/backup/dump_test_db.sql
+# exit
+tim@tim-VirtualBox:~$ docker ps
+CONTAINER ID   IMAGE         COMMAND                  CREATED      STATUS      PORTS                                       NAMES
+6ba7dec9d1ab   postgres:12   "docker-entrypoint.s…"   2 days ago   Up 2 days   0.0.0.0:5432->5432/tcp, :::5432->5432/tcp   pg-docker
+tim@tim-VirtualBox:~$ docker stop 6ba7dec9d1ab
+6ba7dec9d1ab
+tim@tim-VirtualBox:~$ docker run --rm -d --name pg-docker3 -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test_db -ti -p 5432:5432 -v volBackup:/var/lib/postgresql/backup postgres:1
+2
+4af88dde2852002bf1ece99ae32e16508b502f803dea8500b770189fd3444240
+tim@tim-VirtualBox:~$ docker exec -i -t pg-docker3 psql -U postgres -f var/lib/postgresql/backup/dump_test_db.sql test_db
+SET
+SET
+SET
+SET
+SET
+ set_config
+------------
 
-Остановите контейнер с PostgreSQL (но не удаляйте volumes).
+(1 row)
 
-Поднимите новый пустой контейнер с PostgreSQL.
+SET
+SET
+SET
+SET
+SET
+SET
+CREATE TABLE
+ALTER TABLE
+CREATE SEQUENCE
+ALTER TABLE
+ALTER SEQUENCE
+CREATE TABLE
+ALTER TABLE
+ALTER TABLE
+COPY 5
+COPY 5
+ setval
+--------
+      1
+(1 row)
 
-Восстановите БД test_db в новом контейнере.
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+```
 
-Приведите список операций, который вы применяли для бэкапа данных и восстановления. 
 
----
-
-### Как cдавать задание
-
-Выполненное домашнее задание пришлите ссылкой на .md-файл в вашем репозитории.
-
----
