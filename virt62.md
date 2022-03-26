@@ -99,34 +99,43 @@ test_db=# SELECT * from information_schema.table_privileges WHERE grantee = ('te
 
 
 ## Задача 3
+```
+test_db=# INSERT INTO orders VALUES (1, 'Шоколад', 10), (2, 'Принтер', 3000), (3, 'Книга', 500), (4, 'Монитор', 7000), (5, 'Гитара', 4000);
+INSERT 0 5
+test_db=# INSERT INTO orders VALUES (1, 'Иванов Иван Иванович', 'USA'), (2, 'Петров Петр Петрович', 'Canada'), (3, 'Иоганн Себастьян Бах', 'Japan'), (4, 'Ронни Джеймс Дио', 'Russia'), (5, 'Ritchie Blackmore', 'Russia');
+INSERT 0 5
+test_db=# select * from orders;
+ id |  name   | price
+----+---------+-------
+  1 | Шоколад |    10
+  2 | Принтер |  3000
+  3 | Книга   |   500
+  4 | Монитор |  7000
+  5 | Гитара  |  4000
+(5 rows)
 
-Используя SQL синтаксис - наполните таблицы следующими тестовыми данными:
+test_db=# select * from clients;
+ id |       lastname       | country_rsdnc | zakaz
+----+----------------------+---------------+-------
+  1 | Иванов Иван Иванович | USA           |
+  2 | Петров Петр Петрович | Canada        |
+  3 | Иоганн Себастьян Бах | Japan         |
+  4 | Ронни Джеймс Дио     | Russia        |
+  5 | Ritchie Blackmore    | Russia        |
+(5 rows)
 
-Таблица orders
+test_db=# select count(*) from orders;
+ count
+-------
+     5
+(1 row)
 
-|Наименование|цена|
-|------------|----|
-|Шоколад| 10 |
-|Принтер| 3000 |
-|Книга| 500 |
-|Монитор| 7000|
-|Гитара| 4000|
-
-Таблица clients
-
-|ФИО|Страна проживания|
-|------------|----|
-|Иванов Иван Иванович| USA |
-|Петров Петр Петрович| Canada |
-|Иоганн Себастьян Бах| Japan |
-|Ронни Джеймс Дио| Russia|
-|Ritchie Blackmore| Russia|
-
-Используя SQL синтаксис:
-- вычислите количество записей для каждой таблицы 
-- приведите в ответе:
-    - запросы 
-    - результаты их выполнения.
+test_db=# select count(*) from clients;
+ count
+-------
+     5
+(1 row)
+```
 
 ## Задача 4
 
@@ -145,13 +154,61 @@ test_db=# SELECT * from information_schema.table_privileges WHERE grantee = ('te
 Приведите SQL-запрос для выдачи всех пользователей, которые совершили заказ, а также вывод данного запроса.
  
 Подсказк - используйте директиву `UPDATE`.
+```
+test_db=# update clients
+test_db-# set zakaz = (select id from orders where name = 'Книга')
+test_db-# where lastname = 'Иванов Иван Иванович';
+UPDATE 1
+test_db=# update clients
+test_db-# set zakaz = (select id from orders where name = 'Монитор')
+test_db-# where lastname = 'Петров Петр Петрович';
+UPDATE 1
+test_db=# update clients
+test_db-# set zakaz = (select id from orders where name = 'Гитара')
+test_db-# where lastname = 'Иоганн Себастьян Бах';
+UPDATE 1
+test_db=# select * from clients;
+ id |       lastname       | country_rsdnc | zakaz
+----+----------------------+---------------+-------
+  4 | Ронни Джеймс Дио     | Russia        |
+  5 | Ritchie Blackmore    | Russia        |
+  1 | Иванов Иван Иванович | USA           |     3
+  2 | Петров Петр Петрович | Canada        |     4
+  3 | Иоганн Себастьян Бах | Japan         |     5
+(5 rows)
+test_db=# select clients.lastname
+test_db-# from clients
+test_db-# inner join orders
+test_db-# on clients.zakaz = orders.id;
+       lastname
+----------------------
+ Иванов Иван Иванович
+ Петров Петр Петрович
+ Иоганн Себастьян Бах
+(3 rows)
+
+
+```
 
 ## Задача 5
 
-Получите полную информацию по выполнению запроса выдачи всех пользователей из задачи 4 
-(используя директиву EXPLAIN).
 
-Приведите получившийся результат и объясните что значат полученные значения.
+```
+test_db=# EXPLAIN select clients.lastname
+test_db-# from clients
+test_db-# inner join orders
+test_db-# on clients.zakaz = orders.id;
+                              QUERY PLAN
+----------------------------------------------------------------------
+ Hash Join  (cost=37.00..57.24 rows=810 width=32)
+   Hash Cond: (clients.zakaz = orders.id)
+   ->  Seq Scan on clients  (cost=0.00..18.10 rows=810 width=36)
+   ->  Hash  (cost=22.00..22.00 rows=1200 width=4)
+         ->  Seq Scan on orders  (cost=0.00..22.00 rows=1200 width=4)
+(5 rows)
+```
+
+
 
 ## Задача 6
 
