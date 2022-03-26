@@ -6,7 +6,7 @@
 в который будут складываться данные БД и бэкапы.
 
 Приведите получившуюся команду или docker-compose манифест.
-```
+```zsh
 tim@tim-VirtualBox:~$ docker pull postgres:12
 tim@tim-VirtualBox:~$ docker volume create volDB
 volDB
@@ -19,7 +19,7 @@ tim@tim-VirtualBox:~$ docker run --rm -d --name pg-docker -e POSTGRES_PASSWORD=p
 
 
 - итоговый список БД после выполнения пунктов выше,
-```
+```zsh
 test_db=# \l
                                      List of databases
    Name    |  Owner   | Encoding |  Collate   |   Ctype    |       Access privileges
@@ -37,7 +37,7 @@ test_db=# \l
 
 
 - описание таблиц (describe)
-```
+```zsh
 test_db=# \d clients
                                 Table "public.clients"
     Column     |  Type   | Collation | Nullable |               Default
@@ -66,7 +66,7 @@ Referenced by:
 - SQL-запрос для выдачи списка пользователей с правами над таблицами test_db
 - список пользователей с правами над таблицами test_db
 
-```
+```zsh
 test_db=# SELECT * from information_schema.table_privileges WHERE grantee = ('test-simple-user');
  grantor  |     grantee      | table_catalog | table_schema | table_name | privilege_type | is_grantable | with_hierarchy
 ----------+------------------+---------------+--------------+------------+----------------+--------------+----------------
@@ -98,7 +98,7 @@ test_db=# SELECT * from information_schema.table_privileges WHERE grantee = ('te
 
 
 ## Задача 3
-```
+```zsh
 test_db=# INSERT INTO orders VALUES (1, 'Шоколад', 10), (2, 'Принтер', 3000), (3, 'Книга', 500), (4, 'Монитор', 7000), (5, 'Гитара', 4000);
 INSERT 0 5
 test_db=# INSERT INTO orders VALUES (1, 'Иванов Иван Иванович', 'USA'), (2, 'Петров Петр Петрович', 'Canada'), (3, 'Иоганн Себастьян Бах', 'Japan'), (4, 'Ронни Джеймс Дио', 'Russia'), (5, 'Ritchie Blackmore', 'Russia');
@@ -138,22 +138,7 @@ test_db=# select count(*) from clients;
 
 ## Задача 4
 
-Часть пользователей из таблицы clients решили оформить заказы из таблицы orders.
-
-Используя foreign keys свяжите записи из таблиц, согласно таблице:
-
-|ФИО|Заказ|
-|------------|----|
-|Иванов Иван Иванович| Книга |
-|Петров Петр Петрович| Монитор |
-|Иоганн Себастьян Бах| Гитара |
-
-Приведите SQL-запросы для выполнения данных операций.
-
-Приведите SQL-запрос для выдачи всех пользователей, которые совершили заказ, а также вывод данного запроса.
- 
-Подсказк - используйте директиву `UPDATE`.
-```
+```zsh
 test_db=# update clients
 test_db-# set zakaz = (select id from orders where name = 'Книга')
 test_db-# where lastname = 'Иванов Иван Иванович';
@@ -192,7 +177,7 @@ test_db-# on clients.zakaz = orders.id;
 ## Задача 5
 
 
-```
+```zsh
 test_db=# EXPLAIN select clients.lastname
 test_db-# from clients
 test_db-# inner join orders
@@ -214,7 +199,7 @@ test_db-# on clients.zakaz = orders.id;
 ## Задача 6
 
  
-```
+```zsh
 tim@tim-VirtualBox:~$ docker exec -i -t pg-docker /bin/sh
 # pg_dumpall -h localhost -U postgres test_db > var/lib/postgresql/backup/dump_test_db.sql
 # exit
