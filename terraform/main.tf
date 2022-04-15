@@ -10,6 +10,7 @@ provider "yandex" {
   service_account_key_file = "key.json"
   cloud_id  = "b1ghn66scihrboe3sfhv"
   folder_id = "b1goftamkelavkhtqfcd"
+  zone = "ru-central1-a"
 }
 # VM
 resource "yandex_compute_instance" "vm-1" {
