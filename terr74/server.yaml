@@ -1,0 +1,17 @@
+
+repos:
+- id: github.com/hank134/terrnetology*
+  workflow: hinetology
+  apply_requirements: [approved, mergeable]
+  allowed_overrides: [workflow]
+  allow_custom_workflows: true
+workflows:
+  hinetology:
+    plan: 
+      steps:
+        - init:
+            extra_args: ["-lock=false"]
+        - plan:
+            extra_args: ["-lock=false"]
+    apply:
+      steps: [apply]
