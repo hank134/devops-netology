@@ -1,0 +1,10 @@
+version: 3
+projects:
+- dir: terrnetology
+  workspace: stage
+  autoplan:
+    when_modified: ["../modules/**/*.tf", "*.tf*"]
+- dir: terrnetology
+  workspace: prod
+  autoplan:
+    when_modified: ["../modules/**/*.tf", "*.tf*"]
