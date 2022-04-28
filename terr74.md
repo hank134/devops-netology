@@ -35,6 +35,12 @@
 
 В качестве результата приложите ссылку на файлы `server.yaml` и `atlantis.yaml`.
 
+Файлы: 
+[atlantis.yaml](https://github.com/hank134/devops-netology/blob/main/terr74/atlantis.yaml) , [server.yaml](https://github.com/hank134/devops-netology/blob/main/terr74/server.yaml)
+
+![image](https://user-images.githubusercontent.com/93483129/165823456-b5d05a7f-dab7-4370-bdf1-f0f7188c857d.png)
+
+
 ## Задача 3. Знакомство с каталогом модулей. 
 
 1. В [каталоге модулей](https://registry.terraform.io/browse/modules) найдите официальный модуль от aws для создания
