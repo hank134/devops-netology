@@ -7,8 +7,9 @@ terraform {
   }
 }
 provider "yandex" {
-  service_account_key_file = "key.json"
-  cloud_id  = "b1ghn66scihrboe3sfhv"
+ service_account_key_file = "key.json"
+ #token = "AQVNzzA_S4HMmRY3obvR-f48fevmzsaiFUZ-t8bW"
+ cloud_id  = "b1ghn66scihrboe3sfhv"
   folder_id = "b1goftamkelavkhtqfcd"
   zone = "ru-central1-a"
 }
@@ -20,8 +21,8 @@ endpoint = "storage.yandexcloud.net"
 bucket = "ntlgtimbucket"
 region = "ru-central1"
 key = "terr73.tfstate"
-access_key = "YCAJEv3zzCvwnvFdA6NDuz7y-"
-secret_key = "YCOPHmEl5gjNe26ZHogy53zxeLtAl-u2hkYEQqg_"
+access_key = "YCAJE3dthFT2AB4LB6gxKAHjE"
+secret_key = "YCPpO5CXigIIfO29FBVG5xd0lfxItMhVopkBfWHw"
 skip_region_validation = true
 skip_credentials_validation = true
 }

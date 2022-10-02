@@ -7,8 +7,9 @@ terraform {
   }
 }
 provider "yandex" {
-  service_account_key_file = "key.json"
-  cloud_id  = "b1ghn66scihrboe3sfhv"
+ # service_account_key_file = "key.json"
+token = "t1.9euelZqUxp6Zl5jKmZ2WxsmYnJqMy-3rnpWamZSZyInJlJyez83IkpaazZHl8_dcX1Rs-e8iNTZA_t3z9xwOUmz57yI1NkD-.pLDvo5up2h9e2i0XRHCxvh9FrVtVj96nOU5ahqjU7TWMgExhdYQG6TIC-hKl48TgMhMWY-Ld1_Ldw99kgVvuAg"  
+cloud_id  = "b1ghn66scihrboe3sfhv"
   folder_id = "b1goftamkelavkhtqfcd"
   zone = "ru-central1-a"
 }
@@ -39,13 +40,13 @@ resource "yandex_compute_instance" "vm-1" {
   }
 }
 #Net
-resource "yandex_vpc_network" "network-1" {
+resource "yandex_vpc_network" "network-2" {
   name = "network1-${terraform.workspace}"
 }
 resource "yandex_vpc_subnet" "subnet-1" {
   name           = "subnet1-${terraform.workspace}"
   zone           = "ru-central1-a"
-  network_id     = yandex_vpc_network.network-1.id
+  network_id     = yandex_vpc_network.network-2.id
   v4_cidr_blocks = ["192.168.10.0/24"]
 }
 
