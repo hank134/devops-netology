@@ -55,6 +55,8 @@ tim@tim-VirtualBox:~/dev$ openssl x509 -req -in dev2.csr -CA /home/tim/.minikube
 Signature ok
 subject=CN = dev2
 Getting CA Private Key
+```
+```javascript
 tim@tim-VirtualBox:~/dev$ kubectl config set-credentials dev2 --client-certificate=/home/tim/dev/dev2.crt --client-key=/home/tim/dev/dev2.key
 User "dev2" set.
 tim@tim-VirtualBox:~/dev$ kubectl config set-context dev2 --namespace=default --cluster=minikube --user=dev2
@@ -87,6 +89,8 @@ tim@tim-VirtualBox:~/dev$ cat <<EOF | kubectl apply -f -
 >   name: develop-logs
 > EOF
 rolebinding.rbac.authorization.k8s.io/devevelop-view configured
+```
+```javascript
 tim@tim-VirtualBox:~/dev$ kubectl config use-context dev2
 Switched to context "dev2".
 tim@tim-VirtualBox:~/dev$ kubectl get pods
@@ -151,6 +155,8 @@ Node-Selectors:              <none>
 Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
                              node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
 Events:                      <none>
+```
+```javascript
 tim@tim-VirtualBox:~/dev$ kubectl logs hello-minikube-65dc654df9-8ptc6 
 /docker-entrypoint.sh: /docker-entrypoint.d/ is not empty, will attempt to perform configuration
 /docker-entrypoint.sh: Looking for shell scripts in /docker-entrypoint.d/
