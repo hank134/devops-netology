@@ -8,9 +8,10 @@
 * запуск etcd производить на мастере.
 
 ## Ответ
+---
 [host.yaml](./12-4/host.yaml)   
 [k8s-cluster.yml](./12-4/k8s-cluster.yml)
----
+
 Локальное подключение к кластеру
 ```javascript
 ubuntu@fhmbih463fnub04q77tt:~/kubespray$ kubectl get nodes
@@ -45,7 +46,7 @@ node5   Ready    <none>          18m   v1.25.3
 * работать должны на минимально допустимых EC2 — t3.small.
 
 ## Ответ
-
+---
 YC + Terraform   
 [main.tf](./12-3/terraform/main.tf)
 
