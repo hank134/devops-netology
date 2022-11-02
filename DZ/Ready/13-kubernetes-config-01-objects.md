@@ -62,7 +62,7 @@ service/back-app-ip       ClusterIP   10.100.128.19   <none>        8080/TCP   4
 service/front-app-ip      ClusterIP   10.103.42.81    <none>        8080/TCP   41m   app=front-app
 service/postgres-db-svc   ClusterIP   10.102.76.42    <none>        5432/TCP   75m   app=postgres-db
 ```
-Проверка   
+Проверка    
 Front видит Back
 ```javascript
 tim@tim-VirtualBox:~/devops-netology/DZ/Ready/13-1/prod$ kubectl exec -it -c front front-app-5b6659959b-kwp42 -- curl 10.100.128.19:8080
