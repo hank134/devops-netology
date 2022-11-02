@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: hello-node3
+  name: hello-node3
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-node3
+  template:
+    metadata:
+      labels:
+        app: hello-node3
+    spec:
+      containers:
+      - image: registry.k8s.io/echoserver:1.4
+        name: echoserver
