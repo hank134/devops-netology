@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: back-app
+  namespace: prod
+  labels:
+    app: back-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: back-app
+  template:
+    metadata:
+      labels:
+        app: back-app
+    spec:
+      containers:
+      - image: praqma/network-multitool:alpine-extra
+        imagePullPolicy: IfNotPresent
+        name: back
+        env:
+        - name: HTTP_PORT
+          value: "8080"
+        volumeMounts:
+        - mountPath: "/to_front"
+          name: nfs-storage
+      volumes:
+      - name: nfs-storage
+        persistentVolumeClaim:
+          claimName: test-dynamic-volume-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: back-app-ip
+  namespace: prod
+spec:
+  selector:
+    app: back-app
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: 8080
